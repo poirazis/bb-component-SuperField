@@ -1,0 +1,17 @@
+{
+  "type": "component",
+  "metadata": {},
+  "schema": {
+    "name": "bb-component-SuperField",
+    "friendlyName": "bb-component-SuperField",
+    "description": "A multi type Input Field component for Budibase",
+    "icon": "Text",
+    "settings": [
+      {
+        "type": "text",
+        "key": "text",
+        "label": "Text"
+      }
+    ]
+  }
+}
