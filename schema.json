@@ -3,7 +3,7 @@
   "metadata": {},
   "schema": {
     "name": "bb-component-SuperField",
-    "friendlyName": "bb-component-SuperField",
+    "friendlyName": "Super Field",
     "description": "A multi type Input Field component for Budibase",
     "icon": "Text",
     "settings": [
@@ -11,6 +11,21 @@
         "type": "text",
         "key": "text",
         "label": "Text"
+      },
+      {
+        "type": "field/string",
+        "key": "field",
+        "label": "Field"
+      }, 
+      {
+        "type" : "select",
+        "key" : "fieldType",
+        "label" : "Field Type",
+        "options" : [
+          { "label" : "Auto" , "value" : "auto"},
+          { "label" : "String" , "value" : "string"},
+          { "label" : "Relationship" , "value" : "link"}
+        ]
       }
     ]
   }
