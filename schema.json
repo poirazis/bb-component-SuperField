@@ -8,23 +8,243 @@
     "icon": "Text",
     "settings": [
       {
-        "type": "text",
-        "key": "text",
-        "label": "Text"
+        "type" : "select",
+        "label" : "Type",
+        "key" : "fieldType",
+        "showInBar" : true,
+        "options" : [
+          { "label" : "String" , "value" : "string" },
+          { "label" : "Number" , "value" : "number" },
+          { "label" : "Boolean" , "value" : "boolean" },
+          { "label" : "Options" , "value" : "options" },
+          { "label" : "Multi Select" , "value" : "array" },
+          { "label" : "Relationship" , "value" : "link" },
+          { "label" : "DateTime" , "value" : "datetime" }
+        ],
+        "defaultValue" : "string"
       },
       {
-        "type": "field/string",
-        "key": "field",
-        "label": "Field"
-      }, 
+        "type" : "boolean",
+        "key": "inForm",
+        "hidden" : true
+      },
       {
-        "type" : "select",
-        "key" : "fieldType",
-        "label" : "Field Type",
-        "options" : [
-          { "label" : "Auto" , "value" : "auto"},
-          { "label" : "String" , "value" : "string"},
-          { "label" : "Relationship" , "value" : "link"}
+        "section" : true,
+        "name" : "Form Field Settings",
+        "dependsOn" : "inForm",
+        "settings" : [
+          {
+            "type": "field/string",
+            "label": "Field",
+            "key": "stringField",
+            "resetOn" : "fieldType",
+            "dependsOn" : { "setting" : "fieldType", "value": "string" }
+          },
+          {
+            "type": "field/number",
+            "label": "Field",
+            "key": "numberField",
+            "resetOn" : "fieldType",
+            "dependsOn" : { "setting" : "fieldType", "value": "number" }
+          },
+          {
+            "type": "field/boolean",
+            "label": "Field",
+            "key": "booleanField",
+            "resetOn" : "fieldType",
+            "dependsOn" : { "setting" : "fieldType", "value": "boolean" }
+          },
+          {
+            "type": "field/datetime",
+            "label": "Field",
+            "key": "datetimeField",
+            "resetOn" : "fieldType",
+            "dependsOn" : { "setting" : "fieldType", "value": "datetime" }
+          },
+          {
+            "type": "field/options",
+            "label": "Field",
+            "key": "optionsField",
+            "resetOn" : "fieldType",
+            "dependsOn" : { "setting" : "fieldType", "value": "options" }
+          },
+          {
+            "type": "field/array",
+            "label": "Field",
+            "key": "arrayField",
+            "resetOn" : "fieldType",
+            "dependsOn" : { "setting" : "fieldType", "value": "array" }
+          },
+          {
+            "type": "field/link",
+            "label": "Field",
+            "key": "linkField",
+            "resetOn" : "fieldType",
+            "dependsOn" : { "setting" : "fieldType", "value": "link" }
+          }
+        ]
+      },
+
+      {
+        "type": "text",
+        "label": "Label",
+        "key": "thelabel"
+      },
+      {
+        "type": "text",
+        "label": "Placeholder",
+        "key": "placeholder",
+        "resetOn" : "fieldType"
+      },
+      {
+        "type": "text",
+        "label": "Default value",
+        "key": "defaultValue",
+        "resetOn" : "fieldType",
+        "supportsConditions": false
+      },
+      {
+        "type": "text",
+        "label": "Help text",
+        "key": "helpText"
+      },
+      {
+        "type": "event",
+        "label": "On change",
+        "key": "onChange",
+        "context": [
+          {
+            "label": "Field Value",
+            "key": "value"
+          }
+        ]
+      },
+      {
+        "type": "boolean",
+        "label": "Disabled",
+        "key": "disabled",
+        "defaultValue": false
+      },
+      {
+        "type": "boolean",
+        "label": "Read only",
+        "key": "readonly",
+        "defaultValue": false,
+        "dependsOn": {
+          "setting": "disabled",
+          "value": true,
+          "invert": true
+        }
+      },
+      {
+        "type": "validation/string",
+        "label": "Validation",
+        "key": "stringValidation",
+        "resetOn" : "fieldType",
+        "dependsOn" : { "setting" : "fieldType", "value": "string" }
+      },
+      {
+        "type": "validation/number",
+        "label": "Validation",
+        "key": "numberValidation",
+        "resetOn" : "fieldType",
+        "dependsOn" : { "setting" : "fieldType", "value": "number" }
+      },
+      {
+        "type": "validation/boolean",
+        "label": "Validation",
+        "key": "booleanValidation",
+        "resetOn" : "fieldType",
+        "dependsOn" : { "setting" : "fieldType", "value": "boolean" }
+      },
+      {
+        "type": "validation/datetime",
+        "label": "Validation",
+        "key": "datetimeValidation",
+        "resetOn" : "fieldType",
+        "dependsOn" : { "setting" : "fieldType", "value": "datetime" }
+      },
+      {
+        "type": "validation/array",
+        "label": "Validation",
+        "key": "arrayValidation",
+        "resetOn" : "fieldType",
+        "dependsOn" : { "setting" : "fieldType", "value": "array" }
+      },
+      {
+        "type": "validation/array",
+        "label": "Validation",
+        "key": "optionsValidation",
+        "resetOn" : "fieldType",
+        "dependsOn" : { "setting" : "fieldType", "value": "options" }
+      },
+      {
+        "type": "validation/link",
+        "label": "Validation",
+        "key": "linkValidation",
+        "resetOn" : "fieldType",
+        "dependsOn" : { "setting" : "fieldType", "value": "link" }
+      },
+      {
+        "type": "select",
+        "label": "Alignment",
+        "key": "align",
+        "defaultValue": "left",
+        "showInBar": true,
+        "barStyle": "buttons",
+        "options": [
+          {
+            "label": "Left",
+            "value": "left",
+            "barIcon": "TextAlignLeft",
+            "barTitle": "Align left"
+          },
+          {
+            "label": "Center",
+            "value": "center",
+            "barIcon": "TextAlignCenter",
+            "barTitle": "Align center"
+          },
+          {
+            "label": "Right",
+            "value": "right",
+            "barIcon": "TextAlignRight",
+            "barTitle": "Align right"
+          },
+          {
+            "label": "Justify",
+            "value": "justify",
+            "barIcon": "TextAlignJustify",
+            "barTitle": "Justify text"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "label": "Layout",
+        "key": "span",
+        "defaultValue": 6,
+        "showInBar": true,
+        "barStyle": "buttons",
+        "options": [
+          {
+            "label": "1 column",
+            "value": 6,
+            "barIcon": "Stop",
+            "barTitle": "1 column"
+          },
+          {
+            "label": "2 columns",
+            "value": 3,
+            "barIcon": "ColumnTwoA",
+            "barTitle": "2 columns"
+          },
+          {
+            "label": "3 columns",
+            "value": 2,
+            "barIcon": "ViewColumn",
+            "barTitle": "3 columns"
+          }
         ]
       }
     ]
