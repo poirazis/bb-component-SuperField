@@ -129,6 +129,14 @@
     },
   };
  
+
+  const handleKeyboard = ( e ) => {
+    if ( e.key == "Enter" ) {
+      buttonClick("repeater_add")
+      setTimeout( () => cellStates[items.length].focus(), 10)
+    }
+  }
+
   const buttonClick = (group, idx) => {
     if (group == "front" && frontButtonsGrouping == "single") {
       frontButtonsSelected = [idx];
@@ -147,11 +155,13 @@
     }
 
     if ( group == "repeater_add" ) {
-      items = [...items, { id: idx + 1 , name: idx + 1}]
+      items = [...items, { id: items.length + 1, name: idx + 1}]
+      setTimeout( () => cellStates[items.length].focus(), 10)
     } else if ( group == "repeater_remove" ) {
       if ( items.length > 1) {
       items.pop();
       items = items;
+
       }
     }
   };
@@ -171,7 +181,7 @@
   <div class="cell-items" use:dndzone="{{items, flipDurationMs, dropTargetStyle: {}}}" on:consider="{handleDndConsider}" on:finalize="{handleDndFinalize}" >
 
     {#each items as item , item_idx (item.id)}
-      <div class="inline-cell">
+      <div class="inline-cell" on:focus={cellStates[item.id].focus} tabindex="0" on:keydown={handleKeyboard}>
         {#if repeatable}
           <div class="dragHandle">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-grip-vertical"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
@@ -202,7 +212,7 @@
           </div>
         {/if}
 
-        <div class="inline-cells" on:focus={cellStates[item.id].focus} tabindex="0">
+        <div class="inline-cells">
           <SuperCell
             bind:cellState={cellStates[item.id]}
             cellOptions={{}}
@@ -241,6 +251,17 @@
             class="spectrum-ActionGroup spectrum-ActionGroup--compact spectrum-ActionGroup--sizeM"
             class:spectrum-ActionGroup--quiet={buttonsQuiet}
           >
+            {#if items.length == 1 || item_idx == (items.length - 1) }
+              <button
+                class="spectrum-ActionButton spectrum-ActionButton--sizeM"
+                on:click={(e) => buttonClick("repeater_add", item.id)}
+                class:spectrum-ActionButton--quiet={buttonsQuiet}
+              >
+                <span class="spectrum-ActionButton-label">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                </span>
+              </button>
+            {/if}
 
             {#if items.length > 1}
               <button
@@ -254,17 +275,7 @@
                 </span>
               </button>
             {/if}
-            {#if items.length == 1 || item_idx == (items.length - 1) }
-            <button
-              class="spectrum-ActionButton spectrum-ActionButton--sizeM"
-              on:click={(e) => buttonClick("repeater_add", item.id)}
-              class:spectrum-ActionButton--quiet={buttonsQuiet}
-            >
-              <span class="spectrum-ActionButton-label">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-              </span>
-            </button>
-          {/if}
+
           </div>
         {/if}
 
@@ -351,7 +362,7 @@
     display: flex;
     align-items: center;
     height: 100%;
-    color: var(--spectrum-global-color-gray-600);
+    color: var(--spectrum-global-color-gray-500);
   }
   .dragHandle:hover {
     color: var(--spectrum-global-color-gray-900);
