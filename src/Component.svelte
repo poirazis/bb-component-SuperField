@@ -132,9 +132,15 @@
 
   const handleKeyboard = ( e ) => {
     if ( e.key == "Enter" ) {
-      buttonClick("repeater_add")
-      setTimeout( () => cellStates[items.length].focus(), 10)
+      if ( items[items.length-1].value ) {
+        buttonClick("repeater_add")
+        setTimeout( () => cellStates[items.length].focus(), 10)
+      }
     }
+
+    if ( e.key == "Escape" && !(items[items.length-1].value) )
+      buttonClick("repeater_remove", items.length - 1)
+
   }
 
   const buttonClick = (group, idx) => {
@@ -155,8 +161,13 @@
     }
 
     if ( group == "repeater_add" ) {
-      items = [...items, { id: items.length + 1, name: idx + 1}]
-      setTimeout( () => cellStates[items.length].focus(), 10)
+      if ( items[items.length-1].value ) {
+        items = [...items, { id: items.length + 1, name: idx + 1}]
+        setTimeout( () => cellStates[items.length].focus(), 10)
+      }
+      else {
+        setTimeout( () => cellStates[idx].focus(), 10)
+      } 
     } else if ( group == "repeater_remove" ) {
       if ( items.length > 1) {
       items.pop();
