@@ -256,12 +256,35 @@
       },
       {
         "section": true,
+        "name": "Repeatable",
+        "settings": [
+          {
+            "type": "boolean",
+            "key" : "repeatable",
+            "label" : "Repeatable",
+            "defaultValue" : false
+          }
+        ]
+      },
+      {
+        "section": true,
         "name": "Front Inline Buttons",
         "settings": [
           {
             "type": "boolean",
             "key" : "frontButtonsQuiet",
             "label" : "Quiet",
+            "defaultValue" : false
+          },
+          {
+            "type": "select",
+            "key" : "frontButtonsGrouping",
+            "label" : "Grouping",
+            "options" : [
+              { "label" : "No Grouping", "value" : false },
+              { "label" : "Single Selection", "value" : "single" },
+              { "label" : "Multi Selection", "value" : "multi" }
+            ],
             "defaultValue" : false
           },
           {
@@ -278,6 +301,17 @@
             "type": "boolean",
             "key" : "buttonsQuiet",
             "label" : "Quiet",
+            "defaultValue" : false
+          },
+          {
+            "type": "select",
+            "key" : "buttonsGrouping",
+            "label" : "Grouping",
+            "options" : [
+              { "label" : "No Grouping", "value" : false },
+              { "label" : "Single Selection", "value" : "single" },
+              { "label" : "Multi Selection", "value" : "multi" }
+            ],
             "defaultValue" : false
           },
           {
