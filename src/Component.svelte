@@ -26,7 +26,12 @@
   export let linkValidation
   export let arrayValidation
 
-  export let thelabel
+  export let frontButtons = []
+  export let frontButtonsQuiet
+  export let buttons = []
+  export let buttonsQuiet
+
+  export let fieldLabel
   export let fieldType = "string";
   export let span = 6;
   export let inForm = false
@@ -40,20 +45,20 @@
   let cellState;
   let wrapperAnchor;
 
-  $: fieldName = fieldType == "string" ? stringField
+  $: fieldName =  fieldType == "string" ? stringField
                 : fieldType == "number" ? numberField
                 : fieldType == "boolean" ? booleanField
-                : fieldType == "datetiem" ? datetimeField
+                : fieldType == "datetime" ? datetimeField
                 : fieldType == "options" ? optionsField
                 : fieldType == "link" ? linkField
-                : fieldType == "array" ? arrayField
-                : "Field"
+                : fieldType == "array" ? arrayField 
+                : stringField
 
   $: formStep = formStepContext ? $formStepContext || 1 : 1;
   $: formField = formApi?.registerField(
     fieldName,
     fieldType,
-    0,
+    undefined,
     false,
     null,
     formStep
@@ -92,11 +97,10 @@
       "min-height": labelPos == "left" ? "2rem" : "4rem",
       gap: labelPos == "left" ? "0.85rem" : "0rem",
       "grid-column": "span " + span,
-      "--label-width": labelWidth ? labelWidth : "5rem",
+      "--label-width": labelPos == "left" ? labelWidth ? labelWidth : "6rem" : "auto"
     },
   };
 
-  $: console.log(labelPos)
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -108,39 +112,56 @@
   on:focus={cellState.focus}
   tabindex="0"
 >
-  <label
-    for="superCell"
-    class="superFieldLabel"
-    class:bound={formContext}
-   >
-    {thelabel || fieldName || "Unamed Field"}
-    {#if formContext && $builderStore.inBuilder}
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="10"
-        height="10"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="var(--spectrum-global-color-blue-500)"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="lucide lucide-database-zap"
-        ><ellipse cx="12" cy="5" rx="9" ry="3" /><path
-          d="M3 5V19A9 3 0 0 0 15 21.84"
-        /><path d="M21 5V8" /><path d="M21 12L18 17H22L19 22" /><path
-          d="M3 12A9 3 0 0 0 14.59 14.87"
-        /></svg
+    <label
+      for="superCell"
+      class="superFieldLabel"
+      class:bound={formContext}
+    >
+      {fieldLabel || fieldName || "Unamed Field"}
+    </label>
+
+    <div class="inline-buttons">
+      <div 
+        class="spectrum-ActionGroup spectrum-ActionGroup--compact spectrum-ActionGroup--sizeM"
+        class:spectrum-ActionGroup--quiet={frontButtonsQuiet}
       >
-    {/if}
-  </label>
-  <SuperCell
-    bind:cellState
-    cellOptions={{}}
-    value=""
-    fieldSchema={{ type: fieldType }}
-    editable={true}
-  />
+        {#each frontButtons as button, idx }
+          <button class="spectrum-ActionButton spectrum-ActionButton--sizeM"
+          class:spectrum-ActionButton--quiet={frontButtonsQuiet || button.quiet }
+          class:warning={button.type == "warning"}
+          class:cta={button.type == "cta"}
+          class:disabled={button.disabled}
+          >
+            <span class="spectrum-ActionButton-label">{@html button?.text}</span>
+          </button>
+        {/each}
+      </div>
+
+      <SuperCell
+        bind:cellState
+        cellOptions={{}}
+        value=""
+        fieldSchema={{ type: fieldType }}
+        editable={true}
+        id="superCell"
+      />
+
+      <div 
+        class="spectrum-ActionGroup spectrum-ActionGroup--compact spectrum-ActionGroup--sizeM"
+        class:spectrum-ActionGroup--quiet={buttonsQuiet}
+      >
+        {#each buttons as button, idx }
+          <button class="spectrum-ActionButton spectrum-ActionButton--sizeM"
+          class:spectrum-ActionButton--quiet={buttonsQuiet || button.quiet }
+          class:warning={button.type == "warning"}
+          class:cta={button.type == "cta"}
+          class:disabled={button.disabled}
+          >
+            <span class="spectrum-ActionButton-label">{@html button?.text}</span>
+          </button>
+        {/each}
+      </div>
+    </div>
 </div>
 
 <style>
@@ -149,7 +170,6 @@
     align-items: stretch;
     justify-content: stretch;
     min-width: 0;
-    min-height: 4rem;
   }
   .superFieldLabel {
     display: flex;
@@ -160,8 +180,39 @@
     min-width: var(--label-width);
     max-width: var(--label-width);
     font-size: 14px;
+    line-height: 2rem;
     font-weight: 400;
     color: var(--spectrum-global-color-gray-700);
+  }
+
+  .warning {
+    color: var(--spectrum-global-color-red-500);
+    border-color: var(--spectrum-global-color-red-500);
+  }
+  .warning:hover {
+    color: #000;
+    background-color: var(--spectrum-global-color-red-500);
+  }
+  .cta {
+    color: #fff;
+    background-color: var(--primaryColor);
+  }
+
+  .disabled {
+    color: var(--spectrum-global-color-gray-600); 
+    background-color: var(--spectrum-global-color-gray-200);
+  }
+
+  .inline-buttons {
+    height: 2rem;
+    display: flex;
+    justify-content: stretch;
+    align-items: stretch;
+  }
+
+ :global(.inline-buttons > .spectrum-ActionGroup > button > span > svg ) {
+    width: 14px;
+    height: 14px;
   }
 
   .superFieldLabel.bound {

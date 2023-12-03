@@ -5,7 +5,13 @@
     "name": "bb-component-SuperField",
     "friendlyName": "Super Field",
     "description": "A multi type Input Field component for Budibase",
-    "icon": "Text",
+    "icon": "EditInLight",
+    "context" : {
+      "type" : "static",
+      "values" : [
+        { "Value" : "object" }
+      ]
+    },
     "settings": [
       {
         "type" : "select",
@@ -16,7 +22,7 @@
           { "label" : "String" , "value" : "string" },
           { "label" : "Number" , "value" : "number" },
           { "label" : "Boolean" , "value" : "boolean" },
-          { "label" : "Options" , "value" : "options" },
+          { "label" : "Options" , "value" : "options"},
           { "label" : "Multi Select" , "value" : "array" },
           { "label" : "Relationship" , "value" : "link" },
           { "label" : "DateTime" , "value" : "datetime" }
@@ -32,6 +38,7 @@
         "section" : true,
         "name" : "Form Field Settings",
         "dependsOn" : "inForm",
+        "resetOn" : "fieldType",
         "settings" : [
           {
             "type": "field/string",
@@ -84,11 +91,11 @@
           }
         ]
       },
-
       {
         "type": "text",
         "label": "Label",
-        "key": "thelabel"
+        "key": "fieldLabel",
+        "supportsConditions": false
       },
       {
         "type": "text",
@@ -244,6 +251,38 @@
             "value": 2,
             "barIcon": "ViewColumn",
             "barTitle": "3 columns"
+          }
+        ]
+      },
+      {
+        "section": true,
+        "name": "Front Inline Buttons",
+        "settings": [
+          {
+            "type": "boolean",
+            "key" : "frontButtonsQuiet",
+            "label" : "Quiet",
+            "defaultValue" : false
+          },
+          {
+            "type": "buttonConfiguration",
+            "key": "frontButtons"
+          }
+        ]
+      },
+      {
+        "section": true,
+        "name": "End Inline Buttons",
+        "settings": [
+          {
+            "type": "boolean",
+            "key" : "buttonsQuiet",
+            "label" : "Quiet",
+            "defaultValue" : false
+          },
+          {
+            "type": "buttonConfiguration",
+            "key": "buttons"
           }
         ]
       }
