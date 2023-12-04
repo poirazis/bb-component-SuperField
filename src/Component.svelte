@@ -42,6 +42,7 @@
   export let span = 6;
   export let inForm = false;
   export let repeatable = false
+  export let reordering
 
   let formField;
   let formStep;
@@ -49,13 +50,12 @@
   let fieldApi;
   let value;
 
-  let cellStates = []
   let wrapperAnchor;
-  let items = [ { id: 0, "name" : "0", value: "" } ]
+  let items = [ { id: 0, value: null } ]
   let flipDurationMs = 130
 
   function handleDndConsider(e) {
-      items = e.detail.items;
+    items = e.detail.items;
   }
 
   function handleDndFinalize(e) {
@@ -130,17 +130,35 @@
   };
  
 
-  const handleKeyboard = ( e ) => {
+  const handleKeyboard = ( e, idx ) => {
     if ( e.key == "Enter" ) {
-      if ( items[items.length-1].value ) {
+      if ( items[idx].value && idx == items.length - 1 ) {
         buttonClick("repeater_add")
-        setTimeout( () => cellStates[items.length].focus(), 10)
+        setTimeout( () => items.at(-1)?.cellState?.focus(), 10)
+      } else if (items[idx].value ) {
+        items[idx].cellState.unfocus()
       }
     }
 
-    if ( e.key == "Escape" && !(items[items.length-1].value) )
-      buttonClick("repeater_remove", items.length - 1)
+    if ( e.key == "Escape") {
+      items[idx].cellState.unfocus() 
+      if ( !items[idx].value )
+        buttonClick("repeater_remove", idx)
+    }
 
+    if ( e.key == "ArrowDown") {
+      if ( idx < items.length - 1 )
+        items[idx+1].cellState.focus()
+      else
+        items[0].cellState.focus();
+    }
+
+    if ( e.key == "ArrowUp") {
+      if ( idx > 0 )
+        items[idx - 1].cellState.focus()
+      else 
+        items.at(-1).cellState.focus()
+    }
   }
 
   const buttonClick = (group, idx) => {
@@ -161,18 +179,20 @@
     }
 
     if ( group == "repeater_add" ) {
-      if ( items[items.length-1].value ) {
-        items = [...items, { id: items.length + 1, name: idx + 1}]
-        setTimeout( () => cellStates[items.length].focus(), 10)
+      console.log(items)
+      if ( items.at(-1).value ) {
+        items = [...items, { id: Math.random(), value: undefined} ]
+        setTimeout( () => items.at(-1)?.cellState?.focus(), 10)
       }
       else {
-        setTimeout( () => cellStates[idx].focus(), 10)
+        items.at(-1).cellState.focus();
       } 
-    } else if ( group == "repeater_remove" ) {
-      if ( items.length > 1) {
-      items.pop();
-      items = items;
+    }
 
+    if ( group == "repeater_remove" ) {
+      if ( items.length > 1) {
+        items.splice(idx,1)
+        items = items;
       }
     }
   };
@@ -192,8 +212,8 @@
   <div class="cell-items" use:dndzone="{{items, flipDurationMs, dropTargetStyle: {}}}" on:consider="{handleDndConsider}" on:finalize="{handleDndFinalize}" >
 
     {#each items as item , item_idx (item.id)}
-      <div class="inline-cell" on:focus={cellStates[item.id].focus} tabindex="0" on:keydown={handleKeyboard}>
-        {#if repeatable}
+      <div class="inline-cell" on:focus={items[item_idx]?.cellState?.focus} tabindex="0" on:keydown={(e) => handleKeyboard (e, item_idx)}>
+        {#if repeatable && reordering }
           <div class="dragHandle">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-grip-vertical"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
           </div>
@@ -223,17 +243,18 @@
           </div>
         {/if}
 
-        <div class="inline-cells">
-          <SuperCell
-            bind:cellState={cellStates[item.id]}
-            cellOptions={{}}
-            value={items[item_idx].value}
-            fieldSchema={{ type: fieldType }}
-            editable={true}
-            id={"sp_cell_" + item_idx}
-            on:change={(e) => items[item_idx].value = e.detail}
-          />
-        </div>
+          <div class="inline-cells">
+            <SuperCell
+              bind:cellState={items[item_idx].cellState}
+              cellOptions={{}}
+              value={items[item_idx].value}
+              fieldSchema={{ type: fieldType }}
+              editable={true}
+              id={"sp_cell_" + item_idx}
+              on:change={(e) => items[item_idx].value = e.detail}
+              on:blur={(e) => { if (!items[item_idx].value) buttonClick("repeater_remove", item_idx)}}
+            />
+          </div>
 
         {#if buttons?.length}
           <div
@@ -264,8 +285,9 @@
           >
             {#if items.length == 1 || item_idx == (items.length - 1) }
               <button
+                tabindex="-1"
                 class="spectrum-ActionButton spectrum-ActionButton--sizeM"
-                on:click={(e) => buttonClick("repeater_add", item.id)}
+                on:mousedown|preventDefault={(e) => buttonClick("repeater_add", item_idx)}
                 class:spectrum-ActionButton--quiet={buttonsQuiet}
               >
                 <span class="spectrum-ActionButton-label">
@@ -274,12 +296,12 @@
               </button>
             {/if}
 
-            {#if items.length > 1}
+            {#if items.length > 1 }
               <button
-                class="spectrum-ActionButton spectrum-ActionButton--sizeM"
-                on:click={(e) => buttonClick("repeater_remove", item.id)}
+              tabindex="-1"
+                class="spectrum-ActionButton spectrum-ActionButton--sizeM delete"
+                on:click={(e) => buttonClick("repeater_remove", item_idx)}
                 class:spectrum-ActionButton--quiet={buttonsQuiet}
-                class:warning={1}
               >
                 <span class="spectrum-ActionButton-label">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -346,6 +368,14 @@
     color: var(--spectrum-global-color-red-500);
     border: none;
   }
+  .spectrum-ActionButton--quiet.delete {
+    color: var(--spectrum-global-color-red-500);
+  }
+
+  .spectrum-ActionButton--quiet.delete:hover{
+    border-color:  var(--spectrum-global-color-red-500);
+  }
+
   .warning:hover {
     color: #000;
     background-color: var(--spectrum-global-color-red-500);

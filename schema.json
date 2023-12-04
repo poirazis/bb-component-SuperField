@@ -263,6 +263,12 @@
             "key" : "repeatable",
             "label" : "Repeatable",
             "defaultValue" : false
+          },
+          {
+            "type": "boolean",
+            "key" : "reordering",
+            "label" : "Drag to Order",
+            "defaultValue" : false
           }
         ]
       },
