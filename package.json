@@ -1,6 +1,6 @@
 {
   "name": "bb-component-SuperField",
-  "version": "1.0.0-Alpha",
+  "version": "1.0.1-Alpha",
   "description": "A multi type Input Field component for Budibase",
   "license": "MIT",
   "svelte": "index.js",

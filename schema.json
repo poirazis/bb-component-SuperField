@@ -269,7 +269,7 @@
             "key" : "minEntries",
             "label" : "Min Entries",
             "defaultValue" : 2,
-            "min" : 2,
+            "min" : 1,
             "max" : 30,
             "dependsOn": "repeatable"
           },
@@ -286,6 +286,7 @@
             "type": "boolean",
             "key" : "reordering",
             "label" : "Drag to Order",
+            "dependsOn": "repeatable",
             "defaultValue" : false
           }
         ]

@@ -41,7 +41,7 @@
   export let span = 6;
   export let inForm = false;
   export let repeatable = false
-  export let minEntries = 2
+  export let minEntries = 1
   export let maxEntries = 10
   export let reordering
 
@@ -57,6 +57,7 @@
 
 
   $: initItems( repeatable ? minEntries : 1 )
+  $: dragDisabled = !reordering
 
   $: fieldName =
     fieldType == "string"
@@ -85,7 +86,6 @@
     formStep
   );
   $: value = fieldState?.value;
-  $: showLabel = labelPos === "above" || false;
   $: disabled = fieldState?.disabled;
 
   $: unsubscribe = formField?.subscribe((value) => {
@@ -194,7 +194,7 @@
     }
 
     if ( group == "repeater_add" ) {
-      if ( items.at(-1).value && items.length < maxEntries) {
+      if (items.at(-1).value && items.length < maxEntries) {
         items = [...items, { id: Math.random(), value: undefined} ]
         setTimeout( () => items.at(-1)?.cellState?.focus(), 10)
       }
@@ -217,18 +217,19 @@
 <div
   class="superField"
   bind:this={wrapperAnchor}
+  on:focus={items.at(0)?.cellState?.focus} 
   tabindex="0"
-  on:focus={items[0]?.cellState?.focus}
   use:styleable={$component.styles}  
 >
   <label for="superCell" class="superFieldLabel" class:bound={formContext}>
     {fieldLabel || fieldName || "Unamed Field"}
   </label>
   
-  <div class="cell-items" use:dndzone="{{items, flipDurationMs, dropTargetStyle: {}}}" on:consider="{handleDndConsider}" on:finalize="{handleDndFinalize}" >
+  <div class="cell-items" use:dndzone="{{items, dragDisabled, flipDurationMs, dropTargetStyle: {}}}" on:consider="{handleDndConsider}" on:finalize="{handleDndFinalize}" >
 
     {#each items as item , item_idx (item.id)}
-      <div class="inline-cell"  on:keydown={(e) => handleKeyboard (e, item_idx)}>
+      <div class="inline-cell" on:keydown={(e) => handleKeyboard (e, item_idx)} >
+        
         {#if repeatable && reordering }
           <div class="dragHandle">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-grip-vertical"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
@@ -259,18 +260,17 @@
           </div>
         {/if}
 
-          <div class="inline-cells">
-            <SuperCell
-              bind:cellState={items[item_idx].cellState}
-              cellOptions={{}}
-              value={items[item_idx].value}
-              fieldSchema={{ type: fieldType }}
-              editable={true}
-              id={"sp_cell_" + item_idx}
-              on:change={(e) => items[item_idx].value = e.detail}
-              on:blur={(e) => { if (!items[item_idx].value) buttonClick("repeater_remove", item_idx)}}
-            />
-          </div>
+        <div class="inline-cells" on:mousedown={ () => setTimeout( () => items.at(item_idx)?.cellState?.focus(), 10) } >
+          <SuperCell
+            bind:cellState={items[item_idx].cellState}
+            cellOptions={{}}
+            value={items[item_idx].value}
+            fieldSchema={{ type: fieldType }}
+            editable={true}
+            id={"sp_cell_" + item_idx}
+            on:change={(e) => items[item_idx].value = e.detail}
+          />
+        </div>
 
         {#if buttons?.length}
           <div
@@ -328,7 +328,7 @@
           </div>
         {/if}
 
-        </div>
+      </div>
     {/each}
   </div>
 
@@ -343,7 +343,7 @@
   }
   .superFieldLabel {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
