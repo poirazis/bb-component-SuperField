@@ -41,6 +41,8 @@
   export let span = 6;
   export let inForm = false;
   export let repeatable = false
+  export let minEntries = 2
+  export let maxEntries = 10
   export let reordering
 
   let formField;
@@ -50,16 +52,11 @@
   let value;
 
   let wrapperAnchor;
-  let items = [ { id: 0, value: null } ]
+  let items = []
   let flipDurationMs = 130
 
-  function handleDndConsider(e) {
-    items = e.detail.items;
-  }
 
-  function handleDndFinalize(e) {
-    items = e.detail.items;
-  }
+  $: initItems( repeatable ? minEntries : 1 )
 
   $: fieldName =
     fieldType == "string"
@@ -131,6 +128,23 @@
   };
  
 
+  function handleDndConsider(e) {
+    items = e.detail.items;
+  }
+
+  function handleDndFinalize(e) {
+    items = e.detail.items;
+  }
+
+  const initItems = ( num ) => {
+    items = []
+    for (let i = 1; i <= num; i++ )
+    {
+      items.push({id: Math.random() })
+    }
+    items = items
+  }
+
   const handleKeyboard = ( e, idx ) => {
     if ( e.key == "Enter" ) {
       if ( items[idx].value && idx == items.length - 1 ) {
@@ -180,8 +194,7 @@
     }
 
     if ( group == "repeater_add" ) {
-      console.log(items)
-      if ( items.at(-1).value ) {
+      if ( items.at(-1).value && items.length < maxEntries) {
         items = [...items, { id: Math.random(), value: undefined} ]
         setTimeout( () => items.at(-1)?.cellState?.focus(), 10)
       }
@@ -191,7 +204,7 @@
     }
 
     if ( group == "repeater_remove" ) {
-      if ( items.length > 1) {
+      if ( items.length > minEntries ) {
         items.splice(idx,1)
         items = items;
       }
@@ -346,7 +359,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.5rem;
     align-items: stretch;
   }
 

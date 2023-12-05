@@ -265,6 +265,24 @@
             "defaultValue" : false
           },
           {
+            "type": "number",
+            "key" : "minEntries",
+            "label" : "Min Entries",
+            "defaultValue" : 2,
+            "min" : 2,
+            "max" : 30,
+            "dependsOn": "repeatable"
+          },
+          {
+            "type": "number",
+            "key" : "maxEntries",
+            "label" : "Max Entries",
+            "defaultValue" : 10,
+            "min" : 2,
+            "max" : 30,
+            "dependsOn": "repeatable"
+          },
+          {
             "type": "boolean",
             "key" : "reordering",
             "label" : "Drag to Order",
