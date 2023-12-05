@@ -116,7 +116,7 @@
     normal: {
       ...$component.styles.normal,
       "flex-direction": labelPos == "left" ? "row" : "column",
-      "min-height": items?.length == 0 ? labelPos == "left" ? "2rem" : "3.75rem"
+      "min-height": items?.length == 1 ? labelPos == "left" ? "2rem" : "3.75rem"
                                        : labelPos == "left" ? ((items?.length * 2.25) )+ "rem"
                                        : ( (items?.length * 2.25) + 1.75 ) + "rem",
 
