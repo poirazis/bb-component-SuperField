@@ -204,6 +204,8 @@
 <div
   class="superField"
   bind:this={wrapperAnchor}
+  tabindex="0"
+  on:focus={items[0]?.cellState?.focus}
   use:styleable={$component.styles}  
 >
   <label for="superCell" class="superFieldLabel" class:bound={formContext}>
@@ -213,7 +215,7 @@
   <div class="cell-items" use:dndzone="{{items, flipDurationMs, dropTargetStyle: {}}}" on:consider="{handleDndConsider}" on:finalize="{handleDndFinalize}" >
 
     {#each items as item , item_idx (item.id)}
-      <div class="inline-cell" on:focus={items[item_idx]?.cellState?.focus} tabindex="0" on:keydown={(e) => handleKeyboard (e, item_idx)}>
+      <div class="inline-cell"  on:keydown={(e) => handleKeyboard (e, item_idx)}>
         {#if repeatable && reordering }
           <div class="dragHandle">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-grip-vertical"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
@@ -354,6 +356,9 @@
     flex-direction: row;
     align-items: center;
     gap: 0.25rem;
+  }
+  .inline-cell:focus {
+    outline: none;
   }
 
   .inline-cells {
