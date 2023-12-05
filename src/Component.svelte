@@ -1,8 +1,7 @@
 <script>
   import { getContext } from "svelte";
-  import SuperCell from "../bb-component-SuperTableCell/lib/SuperTableCell/SuperCell.svelte";
-  import {flip} from "svelte/animate";
-  import {dndzone} from "svelte-dnd-action";
+  import SuperCell from "../..//bb-component-SuperTableCell/lib/SuperTableCell/SuperCell.svelte";
+  import { dndzone } from "svelte-dnd-action";
 
   const { styleable, builderStore, componentStore } = getContext("sdk");
   const component = getContext("component");
@@ -120,8 +119,10 @@
     normal: {
       ...$component.styles.normal,
       "flex-direction": labelPos == "left" ? "row" : "column",
-      "max-height": labelPos == "left" ? "2rem" : ((items?.length * 2.25) + 2 )+ "rem",
-      "min-height": labelPos == "left" ? "2rem" : ((items?.length * 2.25) + 2 )+ "rem",
+      "min-height": items?.length == 0 ? labelPos == "left" ? "2rem" : "3.75rem"
+                                       : labelPos == "left" ? ((items?.length * 2.25) )+ "rem"
+                                       : ( (items?.length * 2.25) + 1.75 ) + "rem",
+
       gap: labelPos == "left" ? "0.85rem" : "0rem",
       "grid-column": "span " + span,
       "--label-width":
@@ -280,15 +281,15 @@
 
         {#if repeatable}
           <div
-            class="spectrum-ActionGroup spectrum-ActionGroup--compact spectrum-ActionGroup--sizeM"
-            class:spectrum-ActionGroup--quiet={buttonsQuiet}
+            class="spectrum-ActionGroup spectrum-ActionGroup--compact spectrum-ActionGroup--sizeS"
+            class:spectrum-ActionGroup--quiet={true}
           >
             {#if items.length == 1 || item_idx == (items.length - 1) }
               <button
                 tabindex="-1"
-                class="spectrum-ActionButton spectrum-ActionButton--sizeM"
+                class="spectrum-ActionButton spectrum-ActionButton--sizeS"
                 on:mousedown|preventDefault={(e) => buttonClick("repeater_add", item_idx)}
-                class:spectrum-ActionButton--quiet={buttonsQuiet}
+                class:spectrum-ActionButton--quiet={true}
               >
                 <span class="spectrum-ActionButton-label">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
@@ -299,9 +300,9 @@
             {#if items.length > 1 }
               <button
               tabindex="-1"
-                class="spectrum-ActionButton spectrum-ActionButton--sizeM delete"
+                class="spectrum-ActionButton spectrum-ActionButton--sizeS delete"
                 on:click={(e) => buttonClick("repeater_remove", item_idx)}
-                class:spectrum-ActionButton--quiet={buttonsQuiet}
+                class:spectrum-ActionButton--quiet={true}
               >
                 <span class="spectrum-ActionButton-label">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -334,22 +335,24 @@
     min-width: var(--label-width);
     max-width: var(--label-width);
     font-size: 14px;
-    line-height: 2rem;
+    line-height: 1.75rem;
     font-weight: 400;
     color: var(--spectrum-global-color-gray-700);
   }
 
   .cell-items {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    align-items: stretch;
   }
 
   .inline-cell {
     flex: 1;
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.25rem;
   }
 
