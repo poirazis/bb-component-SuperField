@@ -1,8 +1,7 @@
 <script>
   import { getContext } from "svelte";
-  import SuperCell from "../bb-component-SuperTableCell/lib/SuperTableCell/SuperCell.svelte";
-  import {flip} from "svelte/animate";
-  import {dndzone} from "svelte-dnd-action";
+  import SuperCell from "../..//bb-component-SuperTableCell/lib/SuperTableCell/SuperCell.svelte";
+  import { dndzone } from "svelte-dnd-action";
 
   const { styleable, builderStore, componentStore } = getContext("sdk");
   const component = getContext("component");
@@ -42,6 +41,8 @@
   export let span = 6;
   export let inForm = false;
   export let repeatable = false
+  export let minEntries = 1
+  export let maxEntries = 10
   export let reordering
 
   let formField;
@@ -51,16 +52,12 @@
   let value;
 
   let wrapperAnchor;
-  let items = [ { id: 0, value: null } ]
+  let items = []
   let flipDurationMs = 130
 
-  function handleDndConsider(e) {
-    items = e.detail.items;
-  }
 
-  function handleDndFinalize(e) {
-    items = e.detail.items;
-  }
+  $: initItems( repeatable ? minEntries : 1 )
+  $: dragDisabled = !reordering
 
   $: fieldName =
     fieldType == "string"
@@ -89,7 +86,6 @@
     formStep
   );
   $: value = fieldState?.value;
-  $: showLabel = labelPos === "above" || false;
   $: disabled = fieldState?.disabled;
 
   $: unsubscribe = formField?.subscribe((value) => {
@@ -120,8 +116,10 @@
     normal: {
       ...$component.styles.normal,
       "flex-direction": labelPos == "left" ? "row" : "column",
-      "max-height": labelPos == "left" ? "2rem" : ((items?.length * 2.25) + 2 )+ "rem",
-      "min-height": labelPos == "left" ? "2rem" : ((items?.length * 2.25) + 2 )+ "rem",
+      "min-height": items?.length == 0 ? labelPos == "left" ? "2rem" : "3.75rem"
+                                       : labelPos == "left" ? ((items?.length * 2.25) )+ "rem"
+                                       : ( (items?.length * 2.25) + 1.75 ) + "rem",
+
       gap: labelPos == "left" ? "0.85rem" : "0rem",
       "grid-column": "span " + span,
       "--label-width":
@@ -129,6 +127,23 @@
     },
   };
  
+
+  function handleDndConsider(e) {
+    items = e.detail.items;
+  }
+
+  function handleDndFinalize(e) {
+    items = e.detail.items;
+  }
+
+  const initItems = ( num ) => {
+    items = []
+    for (let i = 1; i <= num; i++ )
+    {
+      items.push({id: Math.random() })
+    }
+    items = items
+  }
 
   const handleKeyboard = ( e, idx ) => {
     if ( e.key == "Enter" ) {
@@ -179,8 +194,7 @@
     }
 
     if ( group == "repeater_add" ) {
-      console.log(items)
-      if ( items.at(-1).value ) {
+      if (items.at(-1).value && items.length < maxEntries) {
         items = [...items, { id: Math.random(), value: undefined} ]
         setTimeout( () => items.at(-1)?.cellState?.focus(), 10)
       }
@@ -190,7 +204,7 @@
     }
 
     if ( group == "repeater_remove" ) {
-      if ( items.length > 1) {
+      if ( items.length > minEntries ) {
         items.splice(idx,1)
         items = items;
       }
@@ -203,16 +217,19 @@
 <div
   class="superField"
   bind:this={wrapperAnchor}
+  on:focus={items.at(0)?.cellState?.focus} 
+  tabindex="0"
   use:styleable={$component.styles}  
 >
   <label for="superCell" class="superFieldLabel" class:bound={formContext}>
     {fieldLabel || fieldName || "Unamed Field"}
   </label>
   
-  <div class="cell-items" use:dndzone="{{items, flipDurationMs, dropTargetStyle: {}}}" on:consider="{handleDndConsider}" on:finalize="{handleDndFinalize}" >
+  <div class="cell-items" use:dndzone="{{items, dragDisabled, flipDurationMs, dropTargetStyle: {}}}" on:consider="{handleDndConsider}" on:finalize="{handleDndFinalize}" >
 
     {#each items as item , item_idx (item.id)}
-      <div class="inline-cell" on:focus={items[item_idx]?.cellState?.focus} tabindex="0" on:keydown={(e) => handleKeyboard (e, item_idx)}>
+      <div class="inline-cell" on:keydown={(e) => handleKeyboard (e, item_idx)} >
+        
         {#if repeatable && reordering }
           <div class="dragHandle">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-grip-vertical"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
@@ -243,18 +260,17 @@
           </div>
         {/if}
 
-          <div class="inline-cells">
-            <SuperCell
-              bind:cellState={items[item_idx].cellState}
-              cellOptions={{}}
-              value={items[item_idx].value}
-              fieldSchema={{ type: fieldType }}
-              editable={true}
-              id={"sp_cell_" + item_idx}
-              on:change={(e) => items[item_idx].value = e.detail}
-              on:blur={(e) => { if (!items[item_idx].value) buttonClick("repeater_remove", item_idx)}}
-            />
-          </div>
+        <div class="inline-cells" on:mousedown={ () => setTimeout( () => items.at(item_idx)?.cellState?.focus(), 10) } >
+          <SuperCell
+            bind:cellState={items[item_idx].cellState}
+            cellOptions={{}}
+            value={items[item_idx].value}
+            fieldSchema={{ type: fieldType }}
+            editable={true}
+            id={"sp_cell_" + item_idx}
+            on:change={(e) => items[item_idx].value = e.detail}
+          />
+        </div>
 
         {#if buttons?.length}
           <div
@@ -280,15 +296,15 @@
 
         {#if repeatable}
           <div
-            class="spectrum-ActionGroup spectrum-ActionGroup--compact spectrum-ActionGroup--sizeM"
-            class:spectrum-ActionGroup--quiet={buttonsQuiet}
+            class="spectrum-ActionGroup spectrum-ActionGroup--compact spectrum-ActionGroup--sizeS"
+            class:spectrum-ActionGroup--quiet={true}
           >
             {#if items.length == 1 || item_idx == (items.length - 1) }
               <button
                 tabindex="-1"
-                class="spectrum-ActionButton spectrum-ActionButton--sizeM"
+                class="spectrum-ActionButton spectrum-ActionButton--sizeS"
                 on:mousedown|preventDefault={(e) => buttonClick("repeater_add", item_idx)}
-                class:spectrum-ActionButton--quiet={buttonsQuiet}
+                class:spectrum-ActionButton--quiet={true}
               >
                 <span class="spectrum-ActionButton-label">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
@@ -299,9 +315,9 @@
             {#if items.length > 1 }
               <button
               tabindex="-1"
-                class="spectrum-ActionButton spectrum-ActionButton--sizeM delete"
+                class="spectrum-ActionButton spectrum-ActionButton--sizeS delete"
                 on:click={(e) => buttonClick("repeater_remove", item_idx)}
-                class:spectrum-ActionButton--quiet={buttonsQuiet}
+                class:spectrum-ActionButton--quiet={true}
               >
                 <span class="spectrum-ActionButton-label">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -312,7 +328,7 @@
           </div>
         {/if}
 
-        </div>
+      </div>
     {/each}
   </div>
 
@@ -327,30 +343,35 @@
   }
   .superFieldLabel {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     min-width: var(--label-width);
     max-width: var(--label-width);
     font-size: 14px;
-    line-height: 2rem;
+    line-height: 1.75rem;
     font-weight: 400;
     color: var(--spectrum-global-color-gray-700);
   }
 
   .cell-items {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.5rem;
+    align-items: stretch;
   }
 
   .inline-cell {
     flex: 1;
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.25rem;
+  }
+  .inline-cell:focus {
+    outline: none;
   }
 
   .inline-cells {
