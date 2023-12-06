@@ -255,15 +255,24 @@
         ]
       },
       {
+        "type": "boolean",
+        "key" : "repeatable",
+        "label" : "Repeatable",
+        "defaultValue" : false
+      },
+      {
+        "type" : "boolean",
+        "key" : "customButtons",
+        "label" : "Custom Buttons",
+        "defaultValue": false,
+        "dependsOn" : {"setting" : "repeatable", "value" : false }
+      },
+      {
         "section": true,
         "name": "Repeatable",
+        "dependsOn" : "repeatable",
         "settings": [
-          {
-            "type": "boolean",
-            "key" : "repeatable",
-            "label" : "Repeatable",
-            "defaultValue" : false
-          },
+
           {
             "type": "number",
             "key" : "minEntries",
@@ -294,6 +303,7 @@
       {
         "section": true,
         "name": "Front Inline Buttons",
+        "dependsOn" : "customButtons",
         "settings": [
           {
             "type": "boolean",
@@ -321,6 +331,7 @@
       {
         "section": true,
         "name": "End Inline Buttons",
+        "dependsOn" : "customButtons",
         "settings": [
           {
             "type": "boolean",
