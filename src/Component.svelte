@@ -1,6 +1,6 @@
 <script>
   import { getContext } from "svelte";
-  import SuperCell from "../..//bb-component-SuperTableCell/lib/SuperTableCell/SuperCell.svelte";
+  import { SuperCell } from "../bb_super_components_shared/src/lib"
   import { dndzone } from "svelte-dnd-action";
 
   const { styleable, builderStore, componentStore } = getContext("sdk");
@@ -44,6 +44,8 @@
   export let minEntries = 1
   export let maxEntries = 10
   export let reordering
+  export let placeholder
+  export let defaultValue
 
   let formField;
   let formStep;
@@ -127,7 +129,6 @@
     },
   };
  
-
   function handleDndConsider(e) {
     items = e.detail.items;
   }
@@ -217,7 +218,7 @@
 <div
   class="superField"
   bind:this={wrapperAnchor}
-  on:focus={items.at(0)?.cellState?.focus} 
+  on:focus={() => setTimeout( () => items.at(0)?.cellState?.focus(), 10)} 
   tabindex="0"
   use:styleable={$component.styles}  
 >
@@ -263,10 +264,11 @@
         <div class="inline-cells" on:mousedown={ () => setTimeout( () => items.at(item_idx)?.cellState?.focus(), 10) } >
           <SuperCell
             bind:cellState={items[item_idx].cellState}
-            cellOptions={{}}
-            value={items[item_idx].value}
+            cellOptions={{ placeholder, defaultValue }}
+            value={ repeatable ? items[item_idx].value : value }
             fieldSchema={{ type: fieldType }}
             editable={true}
+            unstyled
             id={"sp_cell_" + item_idx}
             on:change={(e) => items[item_idx].value = e.detail}
           />
@@ -287,8 +289,7 @@
                 class:disabled={button.disabled}
                 class:is-selected={buttonsGrouping && buttonsSelected.includes(idx)}
               >
-                <span class="spectrum-ActionButton-label">{@html button?.text}</span
-                >
+                <span class="spectrum-ActionButton-label">{button.text}</span>
               </button>
             {/each}
           </div>
