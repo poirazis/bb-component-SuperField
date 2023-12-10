@@ -82,12 +82,12 @@
   $: formField = formApi?.registerField(
     fieldName,
     fieldType,
-    undefined,
+    defaultValue,
     false,
     null,
     formStep
   );
-  $: value = fieldState?.value;
+  $: value = fieldState?.value ? fieldState.value : defaultValue
   $: disabled = fieldState?.disabled;
 
   $: unsubscribe = formField?.subscribe((value) => {
@@ -123,7 +123,7 @@
                                        : ( (items?.length * 2.25) + 1.75 ) + "rem",
 
       gap: labelPos == "left" ? "0.85rem" : "0rem",
-      "grid-column": "span " + span,
+      "grid-column": labelPos ? "span " + span : null,
       "--label-width":
         labelPos == "left" ? (labelWidth ? labelWidth : "6rem") : "auto",
     },
@@ -218,7 +218,7 @@
 <div
   class="superField"
   bind:this={wrapperAnchor}
-  on:focus={() => setTimeout( () => items.at(0)?.cellState?.focus(), 10)} 
+  on:focus={() => items.at(0)?.cellState?.focus() } 
   tabindex="0"
   use:styleable={$component.styles}  
 >
@@ -261,7 +261,7 @@
           </div>
         {/if}
 
-        <div class="inline-cells" on:mousedown={ () => setTimeout( () => items.at(item_idx)?.cellState?.focus(), 10) } >
+        <div class="inline-cells" on:mousedown|preventDefault|stopPropagation={ () => setTimeout( () => items.at(item_idx)?.cellState?.focus(), 10) } >
           <SuperCell
             bind:cellState={items[item_idx].cellState}
             cellOptions={{ placeholder, defaultValue }}
