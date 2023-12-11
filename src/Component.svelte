@@ -1,6 +1,6 @@
 <script>
   import { getContext } from "svelte";
-  import { SuperCell } from "../bb_super_components_shared/src/lib"
+  import { SuperCell } from "../../bb_super_components_shared/src/lib"
   import { dndzone } from "svelte-dnd-action";
 
   const { styleable, builderStore, componentStore } = getContext("sdk");
@@ -264,7 +264,7 @@
         <div class="inline-cells" on:mousedown|preventDefault|stopPropagation={ () => setTimeout( () => items.at(item_idx)?.cellState?.focus(), 10) } >
           <SuperCell
             bind:cellState={items[item_idx].cellState}
-            cellOptions={{ placeholder, defaultValue }}
+            cellOptions={{ placeholder, defaultValue, role: "formInput" }}
             value={ repeatable ? items[item_idx].value : value }
             fieldSchema={{ type: fieldType }}
             editable={true}
