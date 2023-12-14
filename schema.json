@@ -94,8 +94,7 @@
       {
         "type": "text",
         "label": "Label",
-        "key": "fieldLabel",
-        "supportsConditions": false
+        "key": "fieldLabel"
       },
       {
         "type": "text",
@@ -255,45 +254,20 @@
         ]
       },
       {
-        "section": true,
-        "name": "Repeatable",
-        "settings": [
-          {
-            "type": "boolean",
-            "key" : "repeatable",
-            "label" : "Repeatable",
-            "defaultValue" : false
-          },
-          {
-            "type": "number",
-            "key" : "minEntries",
-            "label" : "Min Entries",
-            "defaultValue" : 2,
-            "min" : 1,
-            "max" : 30,
-            "dependsOn": "repeatable"
-          },
-          {
-            "type": "number",
-            "key" : "maxEntries",
-            "label" : "Max Entries",
-            "defaultValue" : 10,
-            "min" : 2,
-            "max" : 30,
-            "dependsOn": "repeatable"
-          },
-          {
-            "type": "boolean",
-            "key" : "reordering",
-            "label" : "Drag to Order",
-            "dependsOn": "repeatable",
-            "defaultValue" : false
-          }
-        ]
+        "type" : "icon",
+        "key" : "frontIcon",
+        "label" : "Inline Icon"
+      },
+      {
+        "type" : "boolean",
+        "key" : "customButtons",
+        "label" : "Custom Buttons",
+        "defaultValue": false
       },
       {
         "section": true,
         "name": "Front Inline Buttons",
+        "dependsOn" : "customButtons",
         "settings": [
           {
             "type": "boolean",
@@ -321,6 +295,7 @@
       {
         "section": true,
         "name": "End Inline Buttons",
+        "dependsOn" : "customButtons",
         "settings": [
           {
             "type": "boolean",
