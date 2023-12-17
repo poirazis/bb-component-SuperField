@@ -1,5 +1,5 @@
 <script>
-  import { getContext } from "svelte";
+  import { getContext , onDestroy} from "svelte";
   import { SuperCell } from "../../bb_super_components_shared/src/lib"
 
   const { styleable, builderStore, componentStore } = getContext("sdk");
@@ -11,11 +11,11 @@
   const labelWidth = getContext("field-group-label-width");
   const formApi = formContext?.formApi;
 
-  export let stringField;
+  export let field;
   export let numberField;
   export let booleanField;
   export let datetimeField;
-  export let optionsField;
+  export let optionsField; 
   export let linkField;
   export let arrayField;
   export let stringValidation;
@@ -38,11 +38,13 @@
   export let buttonsSelected = [0];
 
   export let fieldLabel;
-  export let fieldType = "string";
+  export let fieldType
   export let span = 6;
   export let inForm = false;
   export let placeholder
   export let defaultValue
+  export let disabled
+  export let readonly
 
   export let frontIcon
 
@@ -54,12 +56,9 @@
   let value;
   let cellState
 
-  let wrapperAnchor;
-  let items = []
-
   $: fieldName =
     fieldType == "string"
-      ? stringField
+      ? field
       : fieldType == "number"
         ? numberField
         : fieldType == "boolean"
@@ -72,25 +71,44 @@
                 ? linkField
                 : fieldType == "array"
                   ? arrayField
-                  : undefined;
+                  : "Unnamed Field";
+
+  $: fieldValidation =
+    fieldType == "string"
+      ? stringValidation
+      : fieldType == "number"
+        ? numberValidation
+        : fieldType == "boolean"
+          ? booleanValidation
+          : fieldType == "datetime"
+            ? datetimeValidation
+            : fieldType == "options"
+              ? optionsValidation
+              : fieldType == "link"
+                ? linkValidation
+                : fieldType == "array"
+                  ? arrayValidation
+                  : null;
 
   $: formStep = formStepContext ? $formStepContext || 1 : 1;
+
   $: formField = formApi?.registerField(
-    fieldName,
+    field,
     fieldType,
     defaultValue,
-    false,
+    disabled,
+    readonly,
     null,
     formStep
-  );
-  $: value = fieldState?.value ? fieldState.value : defaultValue
-  $: disabled = fieldState?.disabled;
+  )
 
   $: unsubscribe = formField?.subscribe((value) => {
     fieldState = value?.fieldState;
     fieldApi = value?.fieldApi;
     fieldSchema = value?.fieldSchema;
   });
+
+  $: value = fieldState?.value ? fieldState.value : defaultValue
 
   $: {
     if (
@@ -115,10 +133,6 @@
     normal: {
       ...$component.styles.normal,
       "flex-direction": labelPos == "left" ? "row" : "column",
-      "min-height": items?.length == 1 ? labelPos == "left" ? "2rem" : "3.75rem"
-                                       : labelPos == "left" ? ((items?.length * 2.25) )+ "rem"
-                                       : ( (items?.length * 2.25) + 1.75 ) + "rem",
-
       gap: labelPos == "left" ? "0.85rem" : "0rem",
       "grid-column": labelPos ? "span " + span : null,
       "--label-width":
@@ -143,13 +157,17 @@
       buttonsSelected = [idx];
     }
   };
+
+  onDestroy(() => {
+    fieldApi?.deregister()
+    unsubscribe?.()
+  })
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 <div
   class="superField"
-  bind:this={wrapperAnchor}
   on:focus={cellState.focus} 
   tabindex="0"
   use:styleable={$component.styles}  
@@ -189,7 +207,7 @@
       {value}
       fieldSchema={{ ...fieldSchema, type: fieldType }}
       editable
-      on:change={(e) => value = e.detail }
+      on:change={(e) => fieldApi?.setValue(e.detail)}
       on:blur={cellState.lostFocus}
     />
 
@@ -235,12 +253,11 @@
     white-space: nowrap;
     min-width: var(--label-width);
     max-width: var(--label-width);
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1.75rem;
     font-weight: 400;
     color: var(--spectrum-global-color-gray-700);
   }
-
 
   .inline-cells {
     flex: 1;

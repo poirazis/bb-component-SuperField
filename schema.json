@@ -9,7 +9,11 @@
     "context" : {
       "type" : "static",
       "values" : [
-        { "Value" : "object" }
+        {
+          "label" : "Field Value",
+          "key" : "value",
+          "type" : "object" 
+        }
       ]
     },
     "settings": [
@@ -43,14 +47,14 @@
           {
             "type": "field/string",
             "label": "Field",
-            "key": "stringField",
+            "key": "field",
             "resetOn" : "fieldType",
             "dependsOn" : { "setting" : "fieldType", "value": "string" }
           },
           {
             "type": "field/number",
             "label": "Field",
-            "key": "numberField",
+            "key": "field",
             "resetOn" : "fieldType",
             "dependsOn" : { "setting" : "fieldType", "value": "number" }
           },
@@ -71,7 +75,7 @@
           {
             "type": "field/options",
             "label": "Field",
-            "key": "optionsField",
+            "key": "field",
             "resetOn" : "fieldType",
             "dependsOn" : { "setting" : "fieldType", "value": "options" }
           },
@@ -316,7 +320,39 @@
           },
           {
             "type": "buttonConfiguration",
-            "key": "buttons"
+            "key": "buttons",
+            "nested" : true
+          }
+        ]
+      },
+      {
+        "section" : true,
+        "name" : "Options Settings",
+        "dependsOn" : { "setting" : "fieldType", "value" : "options" },
+        "settings" : [
+          {
+            "type" : "select",
+            "key"  : "optionsSource",
+            "label": "Options Source",
+            "options" : [
+              { "label" : "Schema" , "value" : "schema" },
+              { "label" : "Data Provider" , "value" : "dataprovider" }
+            ]
+          },
+          {
+            "type" : "dataSource",
+            "key"  : "optionsDataSource",
+            "label": "Data Source"
+          },
+          {
+            "type" : "field",
+            "key"  : "optionsValueField",
+            "label": "Value Field"
+          },
+          {
+            "type" : "field",
+            "key"  : "optionsLabelField",
+            "label": "Value Field"
           }
         ]
       }
