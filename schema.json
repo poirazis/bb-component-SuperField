@@ -17,6 +17,7 @@
       ]
     },
     "settings": [
+
       {
         "type" : "select",
         "label" : "Type",
@@ -26,12 +27,17 @@
           { "label" : "String" , "value" : "string" },
           { "label" : "Number" , "value" : "number" },
           { "label" : "Boolean" , "value" : "boolean" },
+          { "label" : "DateTime" , "value" : "datetime" },
           { "label" : "Options" , "value" : "options"},
-          { "label" : "Multi Select" , "value" : "array" },
-          { "label" : "Relationship" , "value" : "link" },
-          { "label" : "DateTime" , "value" : "datetime" }
+          { "label" : "Relationship" , "value" : "link" }
         ],
         "defaultValue" : "string"
+      },      
+      {
+        "type": "field/string",
+        "label": "Field",
+        "key": "field",
+        "resetOn" : "fieldType"
       },
       {
         "type" : "boolean",
@@ -39,66 +45,9 @@
         "hidden" : true
       },
       {
-        "section" : true,
-        "name" : "Form Field Settings",
-        "dependsOn" : "inForm",
-        "resetOn" : "fieldType",
-        "settings" : [
-          {
-            "type": "field/string",
-            "label": "Field",
-            "key": "field",
-            "resetOn" : "fieldType",
-            "dependsOn" : { "setting" : "fieldType", "value": "string" }
-          },
-          {
-            "type": "field/number",
-            "label": "Field",
-            "key": "field",
-            "resetOn" : "fieldType",
-            "dependsOn" : { "setting" : "fieldType", "value": "number" }
-          },
-          {
-            "type": "field/boolean",
-            "label": "Field",
-            "key": "booleanField",
-            "resetOn" : "fieldType",
-            "dependsOn" : { "setting" : "fieldType", "value": "boolean" }
-          },
-          {
-            "type": "field/datetime",
-            "label": "Field",
-            "key": "datetimeField",
-            "resetOn" : "fieldType",
-            "dependsOn" : { "setting" : "fieldType", "value": "datetime" }
-          },
-          {
-            "type": "field/options",
-            "label": "Field",
-            "key": "field",
-            "resetOn" : "fieldType",
-            "dependsOn" : { "setting" : "fieldType", "value": "options" }
-          },
-          {
-            "type": "field/array",
-            "label": "Field",
-            "key": "arrayField",
-            "resetOn" : "fieldType",
-            "dependsOn" : { "setting" : "fieldType", "value": "array" }
-          },
-          {
-            "type": "field/link",
-            "label": "Field",
-            "key": "linkField",
-            "resetOn" : "fieldType",
-            "dependsOn" : { "setting" : "fieldType", "value": "link" }
-          }
-        ]
-      },
-      {
         "type": "text",
         "label": "Label",
-        "key": "fieldLabel"
+        "key": "label"
       },
       {
         "type": "text",
@@ -128,23 +77,6 @@
             "key": "value"
           }
         ]
-      },
-      {
-        "type": "boolean",
-        "label": "Disabled",
-        "key": "disabled",
-        "defaultValue": false
-      },
-      {
-        "type": "boolean",
-        "label": "Read only",
-        "key": "readonly",
-        "defaultValue": false,
-        "dependsOn": {
-          "setting": "disabled",
-          "value": true,
-          "invert": true
-        }
       },
       {
         "type": "validation/string",
@@ -194,6 +126,23 @@
         "key": "linkValidation",
         "resetOn" : "fieldType",
         "dependsOn" : { "setting" : "fieldType", "value": "link" }
+      },
+      {
+        "type": "boolean",
+        "label": "Disabled",
+        "key": "disabled",
+        "defaultValue": false
+      },
+      {
+        "type": "boolean",
+        "label": "Read only",
+        "key": "readonly",
+        "defaultValue": false,
+        "dependsOn": {
+          "setting": "disabled",
+          "value": true,
+          "invert": true
+        }
       },
       {
         "type": "select",
@@ -328,7 +277,7 @@
       {
         "section" : true,
         "name" : "Options Settings",
-        "dependsOn" : { "setting" : "fieldType", "value" : "options" },
+        "dependsOn" : {"setting" : "fieldType" , "value" : "options" },
         "settings" : [
           {
             "type" : "select",
@@ -336,23 +285,45 @@
             "label": "Options Source",
             "options" : [
               { "label" : "Schema" , "value" : "schema" },
-              { "label" : "Data Provider" , "value" : "dataprovider" }
+              { "label" : "Data Source" , "value" : "datasource" }
             ]
           },
           {
             "type" : "dataSource",
-            "key"  : "optionsDataSource",
-            "label": "Data Source"
+            "key"  : "datasource",
+            "label": "Data Source",
+            "dependsOn" : { "setting" : "optionsSource", "value" : "datasource" }
           },
           {
             "type" : "field",
-            "key"  : "optionsValueField",
-            "label": "Value Field"
+            "key"  : "valueField",
+            "label": "Value Field",
+            "dependsOn" : { "setting" : "optionsSource", "value" : "datasource" }
           },
           {
             "type" : "field",
-            "key"  : "optionsLabelField",
-            "label": "Value Field"
+            "key"  : "labelField",
+            "label": "Label Field",
+            "dependsOn" : { "setting" : "optionsSource", "value" : "datasource" }
+          },
+          {
+            "type" : "select",
+            "key"  : "viewMode",
+            "label": "View Mode",
+            "options" : [
+              { "label" : "Pills" , "value" : "pills" },
+              { "label" : "Checkboxes" , "value" : "checkboxes" },
+              { "label" : "Radio Buttons" , "value" : "radioButtons" },
+              { "label" : "Buttons" , "value" : "buttons" },
+              { "label" : "Text" , "value" : "text" }
+            ],
+            "defaultValue" : "pills"
+          },
+          {
+            "type" : "boolean",
+            "key"  : "optionsColors",
+            "label": "Options Colors",
+            "defaultValue" : true
           }
         ]
       }

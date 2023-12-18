@@ -12,12 +12,7 @@
   const formApi = formContext?.formApi;
 
   export let field;
-  export let numberField;
-  export let booleanField;
-  export let datetimeField;
-  export let optionsField; 
-  export let linkField;
-  export let arrayField;
+  
   export let stringValidation;
   export let numberValidation;
   export let booleanValidation;
@@ -48,6 +43,13 @@
 
   export let frontIcon
 
+  export let optionsSource
+  export let datasource
+  export let valueField
+  export let labelField
+  export let viewMode
+  export let optionsColors = true
+
   let formField;
   let formStep;
   let fieldState;
@@ -55,23 +57,7 @@
   let fieldSchema
   let value;
   let cellState
-
-  $: fieldName =
-    fieldType == "string"
-      ? field
-      : fieldType == "number"
-        ? numberField
-        : fieldType == "boolean"
-          ? booleanField
-          : fieldType == "datetime"
-            ? datetimeField
-            : fieldType == "options"
-              ? optionsField
-              : fieldType == "link"
-                ? linkField
-                : fieldType == "array"
-                  ? arrayField
-                  : "Unnamed Field";
+  
 
   $: fieldValidation =
     fieldType == "string"
@@ -173,7 +159,7 @@
   use:styleable={$component.styles}  
 >
   <label for="superCell" class="superFieldLabel" class:bound={formContext}>
-    {fieldLabel || fieldName || "Unamed Field"}
+    {fieldLabel || field || "Unamed Field"}
   </label>
   
   <div class="inline-cells">
@@ -203,10 +189,22 @@
 
     <SuperCell
       bind:cellState
-      cellOptions={{ placeholder, defaultValue, role: "formInput", clearValueIcon:true, iconFront: frontIcon}}
+      cellOptions={{ 
+        placeholder, 
+        defaultValue,
+        optionsSource,
+        datasource,
+        valueField,
+        labelField,
+        optionsColors,
+        role: "formInput", 
+        clearValueIcon:true, 
+        iconFront: frontIcon
+        }}
       {value}
       fieldSchema={{ ...fieldSchema, type: fieldType }}
       editable
+      simpleView={ viewMode == "text" }
       on:change={(e) => fieldApi?.setValue(e.detail)}
       on:blur={cellState.lostFocus}
     />
